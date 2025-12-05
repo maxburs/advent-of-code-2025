@@ -9,6 +9,7 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "format": "prettier --write --ignore-unknown ."
+    "format": "prettier --write --ignore-unknown .",
+    "test": "NODE_ENV=test node --test"
   }
 }
