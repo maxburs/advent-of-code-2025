@@ -10,10 +10,10 @@ test('example', async () => {
   );
 });
 
-function _test(name: string, input: string, solution: number) {
-  test(name, async () => {
+function _test(input: string, solution: number) {
+  test(input, async () => {
     assert.deepEqual(solve(input), solution);
   });
 }
 
-// _test('move example', 'L1000', 10);
+// _test('L1000', 10);
