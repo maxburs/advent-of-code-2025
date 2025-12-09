@@ -44,7 +44,9 @@ async function main() {
     )
   );
 
-  console.log(solution.solve(await inputPromise));
+  const result = solution.solve(await inputPromise);
+
+  console.log(result);
 }
 
 main();

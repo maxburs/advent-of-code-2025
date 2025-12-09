@@ -5,8 +5,8 @@ import { solve } from './part-1.ts';
 
 test('example', async () => {
   assert.equal(
-    solve(await fs.readFile(import.meta.dirname + '/example.txt', 'utf8')),
-    6,
+    solve(await fs.readFile(import.meta.dirname + '/example.txt', 'utf8'), 10),
+    40,
   );
 });
 
