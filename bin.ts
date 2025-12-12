@@ -32,7 +32,7 @@ async function main() {
   const inputPromise = fs.readFile(
     path.join(
       import.meta.dirname,
-      `day-${args.values.day}/part-${args.values.part}.ts`,
+      `day-${args.values.day}/input.txt`,
     ),
     'utf8',
   );

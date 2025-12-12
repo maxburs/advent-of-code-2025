@@ -16,57 +16,74 @@ export function solve_slow(input: string, connectionsCount: number) {
     .matchAll(/\d+,\d+,\d+/g)
     .map((match, i) => {
       const [x, y, z] = match[0].split(',').map((n) => Number(n));
-      return { x, y, z, circuit: i };
+      return { circuit: i, x, y, z };
     })
     .toArray();
+
+  const connections: {
+    distance: number;
+    boxAIndex: number;
+    boxBIndex: number;
+  }[] = [];
+
+  for (let boxAIndex = 0; boxAIndex < boxes.length; boxAIndex++) {
+    for (let boxBIndex = boxAIndex + 1; boxBIndex < boxes.length; boxBIndex++) {
+      connections.push({
+        distance: calc_distance(boxes[boxAIndex], boxes[boxBIndex]),
+        boxAIndex,
+        boxBIndex,
+      });
+      connections.sort((a, b) => a.distance - b.distance);
+      connections.length = connectionsCount;
+    }
+  }
 
   const circuits: readonly { readonly boxes: number[] }[] = boxes.map(
     (_, i) => ({ boxes: [i] }),
   );
-  const connections = new Set<string>();
 
   function connect(boxAIndex: number, boxBIndex: number) {
-    connections.add(`${boxAIndex},${boxBIndex}`);
     const circuitA = boxes[boxAIndex].circuit;
     const circuitB = boxes[boxBIndex].circuit;
-    const boxA = boxes[boxAIndex];
-    const boxB = boxes[boxBIndex];
-    console.log(
-      `connecting: ${boxAIndex} (${boxA.x},${boxA.y},${boxA.z}) <-> ${boxBIndex} (${boxB.x},${boxB.y},${boxB.z})`,
-    );
-    circuits[circuitA].boxes.push(...circuits[circuitB].boxes);
-    circuits[circuitB].boxes.length = 0;
-    boxB.circuit = boxAIndex;
+    if (circuitA === circuitB) {
+      return;
+    }
+    const circuitBBoxes = circuits[circuitB].boxes;
+    for (let boxIndex of circuitBBoxes) {
+      boxes[boxIndex].circuit = circuitA;
+    }
+    circuits[circuitA].boxes.push(...circuitBBoxes);
+    circuitBBoxes.length = 0;
   }
 
-  for (let k = 0; k < connectionsCount; k++) {
-    let min_distance = Infinity;
-    let boxAIndex: undefined | number;
-    let boxBIndex: undefined | number;
-    for (let i = 0; i < boxes.length; i++) {
-      for (let j = i + 1; j < boxes.length; j++) {
-        const boxA = boxes[i];
-        const boxB = boxes[j];
-        if (boxA.circuit !== boxB.circuit) {
-          const distance = calc_distance(boxA, boxB);
-          if (distance < min_distance) {
-            min_distance = distance;
-            boxAIndex = i;
-            boxBIndex = j;
-          }
-        }
-      }
-    }
+  console.log(connections);
+
+  for (const { boxAIndex, boxBIndex } of connections) {
     connect(boxAIndex!, boxBIndex!);
   }
 
-  console.log(boxes);
-  console.log(circuits);
+  console.table(boxes);
+  console.table(circuits);
+  console.log(
+    `circuits count: ${circuits.reduce((acc, c) => {
+      if (c.boxes.length !== 0) {
+        acc += 1;
+      }
+      return acc;
+    }, 0)}`,
+  );
+  const sizes = circuits
+    .toSorted((a, b) => b.boxes.length - a.boxes.length)
+    .map((c) => c.boxes.length);
+  console.log(`sizes: `, sizes.join(', '));
+  console.log(
+    `sizes 2: `,
+    Object.values(Object.groupBy(boxes, (item) => item.circuit))
+      .sort((a, b) => b!.length - a!.length)
+      .map((c) => c!.length),
+  );
 
-  return circuits
-    .toSorted((a, b) => a.boxes.length - b.boxes.length)
-    .slice(-3)
-    .reduce<number>((acc, n) => acc * n.boxes.length, 1);
+  return sizes.slice(0, 3).reduce<number>((acc, n) => acc * n, 1);
 }
 
 export function solve(input: string, connectionsCount = 1000) {
