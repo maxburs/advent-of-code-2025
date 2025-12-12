@@ -14,6 +14,10 @@ async function main() {
         type: 'string',
         short: 'p',
       },
+      test: {
+        type: 'boolean',
+        short: 't',
+      },
     },
   });
 
@@ -29,24 +33,24 @@ async function main() {
     return;
   }
 
-  const inputPromise = fs.readFile(
-    path.join(
-      import.meta.dirname,
-      `day-${args.values.day}/input.txt`,
-    ),
-    'utf8',
-  );
+  if (args.values.test) {
+    await import(`day-${args.values.day}/part-${args.values.part}.test.ts`);
+  } else {
+    const inputPromise = fs.readFile(
+      path.join(import.meta.dirname, `day-${args.values.day}/input.txt`),
+      'utf8',
+    );
+    const solution: { solve(input: string): number } = await import(
+      path.join(
+        import.meta.dirname,
+        `day-${args.values.day}/part-${args.values.part}.ts`,
+      )
+    );
 
-  const solution: { solve(input: string): number } = await import(
-    path.join(
-      import.meta.dirname,
-      `day-${args.values.day}/part-${args.values.part}.ts`,
-    )
-  );
+    const result = solution.solve(await inputPromise);
 
-  const result = solution.solve(await inputPromise);
-
-  console.log(result);
+    console.log(result);
+  }
 }
 
 main();
