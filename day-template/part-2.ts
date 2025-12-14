@@ -1,2 +1,3 @@
-export function solve(input: string) {
+export function solve(input: string): number {
+  return NaN;
 }

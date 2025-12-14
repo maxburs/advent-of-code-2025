@@ -34,7 +34,7 @@ async function main() {
   }
 
   if (args.values.test) {
-    await import(`day-${args.values.day}/part-${args.values.part}.test.ts`);
+    await import(path.join(import.meta.dirname,`day-${args.values.day}/part-${args.values.part}.test.ts`));
   } else {
     const inputPromise = fs.readFile(
       path.join(import.meta.dirname, `day-${args.values.day}/input.txt`),
