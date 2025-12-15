@@ -3,19 +3,19 @@ import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import { solve } from './part-2.ts';
 
-// test('example', async () => {
-//   assert.equal(
-//     solve(await fs.readFile(import.meta.dirname + '/example.txt', 'utf8')),
-//     24,
-//   );
-// });
+test('example', async () => {
+  assert.equal(
+    solve(await fs.readFile(import.meta.dirname + '/example.txt', 'utf8')),
+    24,
+  );
+});
 
 function _test(
   input: string,
-  { max_area, right_turns }: { max_area: number; right_turns: number },
+  max_area: number,
 ) {
   test(input, async () => {
-    assert.deepEqual(solve(input), { max_area, right_turns });
+    assert.equal(solve(input), max_area);
   });
 }
 
@@ -32,5 +32,5 @@ _test(
   7,9
   7,7,
   5,7`,
-  { max_area: 9, right_turns: 8 },
+  9,
 );
