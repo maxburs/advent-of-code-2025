@@ -16,5 +16,7 @@ node_modules
 #!.yarn/cache
 .pnp.*
 
-input.txt
-example.txt
+/day-*/input.txt
+/day-*/example.txt
+!/day-template/input.txt
+!/day-template/example.txt
