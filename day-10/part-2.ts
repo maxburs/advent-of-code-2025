@@ -2,6 +2,7 @@ type Button = readonly number[];
 
 interface Machine {
   readonly buttons: readonly Button[];
+  // readonly joltage: number;
   readonly joltage_str: string;
   readonly joltage_arr: readonly number[];
 }
@@ -18,8 +19,12 @@ function parse_input(input: string): readonly Machine[] {
         .map((s) => Number(s)),
     );
     const joltage_str = parts.at(-1)!.slice(1, -1);
+    let joltage = 0;
+    for (let i = 0; i < joltage_str.length; i++) {
+      joltage += 1 << i;
+    }
     const joltage_arr = joltage_str.split(',').map(Number);
-    return { buttons, joltage_str, joltage_arr };
+    return { buttons, joltage, joltage_arr };
   });
 }
 
@@ -27,20 +32,26 @@ function moves_required(machine: Machine): undefined | number {
   let presses_required = Infinity;
 
   const joltage_to_presses = new Map<string, number>();
-
+  
   const joltage_counters: number[] = new Array(machine.joltage_arr.length).fill(
     0,
   );
+  let sum = 0;
 
-  function add_lights(joltage: string, presses: number) {
-    const prev_presses = joltage_to_presses.get(joltage);
-    if (prev_presses !== undefined && prev_presses <= presses) {
-      return;
+  function add_lights(presses: number) {
+    if (sum % 3 === 0) {
+      const joltage_str = joltage_counters.join(',');
+      const prev_presses = joltage_to_presses.get(joltage_str);
+      if (prev_presses !== undefined && prev_presses <= presses) {
+        return;
+      }
+      joltage_to_presses.set(joltage_str, presses);
     }
-    joltage_to_presses.set(joltage, presses);
 
-    if (joltage === machine.joltage_str) {
-      presses_required = presses;
+    if (joltage_counters.every((v, i) => machine.joltage_arr[i] === v)) {
+      if (presses < presses_required) {
+        presses_required = presses;
+      }
       return;
     }
     if (presses + 1 === presses_required) {
@@ -50,22 +61,24 @@ function moves_required(machine: Machine): undefined | number {
       let over_limit = false;
       for (const n of button) {
         joltage_counters[n]++;
+        sum++;
         if (joltage_counters[n] > machine.joltage_arr[n]) {
           over_limit = true;
         }
       }
       if (!over_limit) {
-        add_lights(joltage_counters.join(','), presses + 1);
+        add_lights(/* joltage_counters.join(','), */ presses + 1);
       }
       for (const n of button) {
         joltage_counters[n]--;
+        sum--;
       }
     }
   }
 
-  add_lights(joltage_counters.join(','), 0);
+  add_lights(0);
 
-  return joltage_to_presses.get(machine.joltage_str);
+  return presses_required;
 }
 
 export function solve(input: string): number {
