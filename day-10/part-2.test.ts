@@ -6,7 +6,7 @@ import { solve } from './part-2.ts';
 test('example', async () => {
   assert.equal(
     solve(await fs.readFile(import.meta.dirname + '/example.txt', 'utf8')),
-    6,
+    33,
   );
 });
 
